@@ -15,9 +15,9 @@ import check
 
 argparser = None
 
-banned_options = ("classpath",
+banned_options = ("classpath", "release",
                   "nowarn", "Xmaxerrs", "Xmaxwarns", "Werror",
-                  "processorpath", "processor", "proc:none", "release",
+                  "processorpath", "processor", "proc:none",
                   "XepDisableAllChecks", "Xplugin:ErrorProne")
 banned_options_prefixes = ("Xep:", "XepExcludedPaths:")
 
