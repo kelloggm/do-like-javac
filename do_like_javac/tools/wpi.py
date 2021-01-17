@@ -180,4 +180,4 @@ def run(args, javac_commands, jars):
                 diffResult = len(dcmp.diff_files)
 
         # Run one final time without "-Awarns", for the final user output.
-        stats = common.run_cmd(cmd, args, 'wpi')
+        common.run_cmd(cmd, args, 'wpi')
