@@ -21,7 +21,7 @@ banned_options_prefixes = ("Xep:", "XepExcludedPaths:")
 def run(args, javac_commands, jars):
     # checker-framework javac.
     javacheck = os.environ['CHECKERFRAMEWORK']+"/checker/bin/javac"
-    checker_command = [javacheck, "-Ainfer=stubs", "-AmergeStubsWithSource", "-Xmaxerrs", "10000", "-Xmaxwarns", "10000"]
+    checker_command = [javacheck, "-Ainfer=stubs", "-AmergeStubsWithSource", "-Xmaxerrs", "10000", "-Xmaxwarns", "10000", "-Awarns"]
     if args.checker is not None:
         processorArg = ["-processor", args.checker]
     else:
@@ -172,9 +172,6 @@ def run(args, javac_commands, jars):
 
             for stub in stubs:
                 shutil.move(os.path.join(wpiDir, stub), previousIterationDir)
-
-            if stats['return_code'] == 0:
-                return
 
             stubDirs.append(previousIterationDir)
 
