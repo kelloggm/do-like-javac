@@ -26,6 +26,7 @@ fi
 ### clone the CF
 
 /tmp/"$USER"/plume-scripts/git-clone-related typetools checker-framework /tmp/"$USER"/checker-framework
+export CHECKERFRAMEWORK=/tmp/"$USER"/checker-framework
 
 ### setup the CF to use this repo/branch of dljc
 
