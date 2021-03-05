@@ -159,7 +159,7 @@ def run(args, javac_commands, jars):
             pprint.pformat(jc)
 
             cmd = iterationCheckerCmd + ["-classpath", cp] + processorArg + other_args + java_files
-            stats = common.run_cmd(cmd + ["-Ainfer=stubs", "-Awarns"], args, 'wpi')
+            stats = common.run_cmd(cmd + ["-Ainfer=ajava", "-Awarns"], args, 'wpi')
 
             # process outputs
             # move the old wpi files, add them to stub path
