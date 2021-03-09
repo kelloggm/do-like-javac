@@ -2,7 +2,7 @@
 
 set -e
 set -u
-#set -x
+set -x
 set -o pipefail
 
 ### This script runs the Checker Framework's tests that depend on
