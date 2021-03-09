@@ -31,7 +31,7 @@ dljc_branch_name=$(git rev-parse --abbrev-ref HEAD)
 cd /tmp/"$USER"/checker-framework
 cf_branch_name=$(git rev-parse --abbrev-ref HEAD)
 if [ ! "${dljc_branch_name}" = "${cf_branch_name}" ]; then
-  checkout -b "${dljc_branch_name}"
+  git checkout -b "${dljc_branch_name}"
 fi
 
 ### run the CF tests
