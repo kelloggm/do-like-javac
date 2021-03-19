@@ -145,9 +145,9 @@ def run(args, javac_commands, jars):
             stubArg = None
 
             if args.stubs:
-                stubArg = "-Astubs=" + str(args.stubs) + ":" + iterationStubs
+                stubArg = "-Aajava=" + str(args.stubs) + ":" + iterationStubs
             elif iterationStubs != "":
-                stubArg = "-Astubs=" + iterationStubs
+                stubArg = "-Aajava=" + iterationStubs
 
             if stubArg is not None:
                 iterationCheckerCmd = checker_command + [stubArg]
@@ -162,7 +162,7 @@ def run(args, javac_commands, jars):
             pprint.pformat(jc)
 
             cmd = iterationCheckerCmd + ["-classpath", cp] + processorArg + other_args + java_files
-            stats = common.run_cmd(cmd + ["-Ainfer=stubs", "-Awarns"], args, 'wpi')
+            stats = common.run_cmd(cmd + ["-Ainfer=ajava", "-Awarns"], args, 'wpi')
 
             # process outputs
             # move the old wpi files, add them to stub path
