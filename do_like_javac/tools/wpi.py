@@ -53,10 +53,10 @@ def run(args, javac_commands, jars):
 
         iteration = 0
         diffResult = 1
-        stubDirs = []
-        resultsDir = tempfile.mkdtemp(prefix="wpi-stubs-")
+        ajavaDirs = []
+        resultsDir = tempfile.mkdtemp(prefix="wpi-ajava-")
 
-        print "Directory for generated stub files: " + str(resultsDir)
+        print "Directory for generated ajava files: " + str(resultsDir)
 
         javac_switches = jc['javac_switches']
         cp = javac_switches['classpath']
@@ -141,18 +141,12 @@ def run(args, javac_commands, jars):
 
         while diffResult != 0:
 
-            iterationStubs = ':'.join(stubDirs)
-            stubArg = None
-
+            iterationAjavaDirs = ':'.join(ajavaDirs)
+            iterationCheckerCmd = checker_command
             if args.stubs:
-                stubArg = "-Aajava=" + str(args.stubs) + ":" + iterationStubs
-            elif iterationStubs != "":
-                stubArg = "-Aajava=" + iterationStubs
-
-            if stubArg is not None:
-                iterationCheckerCmd = checker_command + [stubArg]
-            else:
-                iterationCheckerCmd = checker_command
+                iterationCheckerCmd.append("-Astubs=" + str(args.stubs))
+            if iterationAjavaDirs != "":
+                iterationCheckerCmd.append("-Aajava=" + iterationAjavaDirs)
 
             # suppress all type.anno.before.modifier warnings, because delombok
             # prints annotations in the wrong place
@@ -165,24 +159,25 @@ def run(args, javac_commands, jars):
             stats = common.run_cmd(cmd + ["-Ainfer=ajava", "-Awarns"], args, 'wpi')
 
             # process outputs
-            # move the old wpi files, add them to stub path
+            # move the old wpi files, add them to ajava path
             previousIterationDir = os.path.join(resultsDir, "iteration" + str(iteration))
             os.mkdir(previousIterationDir)
             iteration += 1
             try:
-                stubs = os.listdir(wpiDir)
+                ajavaFiles = os.listdir(wpiDir)
             except OSError as e:
                 raise Exception("No WPI outputs were discovered. It is likely that WPI failed; "
                                 "please check " + os.path.join(os.getcwd(), 'dljc-out')
                                 + " . Original exception: " + str(e))
 
-            for stub in stubs:
-                shutil.move(os.path.join(wpiDir, stub), previousIterationDir)
+            for ajavaFile in ajavaFiles:
+                shutil.move(os.path.join(wpiDir, ajavaFile),
+                            previousIterationDir)
 
-            stubDirs.append(previousIterationDir)
+            ajavaDirs.append(previousIterationDir)
 
-            if len(stubDirs) > 1:
-                dcmp = dircmp(stubDirs[-1], stubDirs[-2])
+            if len(ajavaDirs) > 1:
+                dcmp = dircmp(ajavaDirs[-1], ajavaDirs[-2])
                 diffResult = len(dcmp.diff_files)
 
         # Run one final time without "-Awarns", for the final user output.
