@@ -6,6 +6,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - env:
+        BASE_BRANCH: ${{ github.base_ref }}
       - name: exec-wpi-many-tests
         run: ./run-cf-tests.sh
         shell: bash

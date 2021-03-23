@@ -18,9 +18,18 @@ else
 fi
 
 ### clone the CF. If there is a branch with the same name as this branch, git-clone-related will check out that branch.
+### To facilitate that during CI runs, switch to the branch with the BASE_BRANCH variable's value if it's available.
+### This variable is set by the wpiMany.yml script when running in CI.
 rm -rf /tmp/"$USER"/checker-framework
+if [ -n "${BASE_BRANCH+x}" ]; then
+  CURR_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+  git checkout "${BASE_BRANCH}"
+fi
 /tmp/"$USER"/plume-scripts/git-clone-related typetools checker-framework /tmp/"$USER"/checker-framework
 export CHECKERFRAMEWORK=/tmp/"$USER"/checker-framework
+if [ -n "${CURR_BRANCH+x}" ]; then
+  git checkout "${CURR_BRANCH}"
+fi
 
 ### enforce that the copy of DLJC being used by the CF is identical to this one by copying
 ### the contents of this repo to checker/bin/.do-like-javac. It is not sufficient to rely on
