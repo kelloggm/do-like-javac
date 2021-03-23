@@ -22,18 +22,17 @@ rm -rf /tmp/"$USER"/checker-framework
 /tmp/"$USER"/plume-scripts/git-clone-related typetools checker-framework /tmp/"$USER"/checker-framework
 export CHECKERFRAMEWORK=/tmp/"$USER"/checker-framework
 
-# see https://stackoverflow.com/questions/58033366/how-to-get-current-branch-within-github-actions/58035262
-dljc_branch_name=${GITHUB_REF##*/}
-
-### enforce that the CF is on the same branch that this copy of DLJC is - if git-clone-related's fallback
-### branch (i.e. master for the CF) is being used, we need to switch to a new branch with this branch's name,
-### so that uses of git-clone-related from the CF's own scripts to fetch do-like-javac return the current branch
-
-cd /tmp/"$USER"/checker-framework
-cf_branch_name=$(git rev-parse --abbrev-ref HEAD)
-if [ ! "${dljc_branch_name}" = "${cf_branch_name}" ]; then
-  git checkout -b "${dljc_branch_name}"
-fi
+### enforce that the copy of DLJC being used by the CF is identical to this one by copying
+### the contents of this repo to checker/bin/.do-like-javac. It is not sufficient to rely on
+### git-clone-related in the CF's tests for this, because the name of the branch in the current
+### might or might not correspond to something that's actually checked in. For example, GitHub
+### Actions pull_request builds always use the branch name "merge" for the build, because they
+### merge the PR branch into master before running. git-clone-related in the CF will end up
+### pulling from DLJC's master when executing the tests, but that *should* be okay.
+rm -rf "${CHECKERFRAMEWORK}"/checker/bin/.do-like-javac
+mkdir -p "${CHECKERFRAMEWORK}"/checker/bin/.do-like-javac
+cp -r * "${CHECKERFRAMEWORK}"/checker/bin/.do-like-javac/
 
 ### run the CF tests
+cd "${CHECKERFRAMEWORK}"
 ./gradlew wpiManyTests wpiPlumeLibTests
