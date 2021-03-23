@@ -1,3 +1,4 @@
+import sys
 from filecmp import dircmp
 
 import common
@@ -22,6 +23,9 @@ ignored_options = ("classpath",
 ignored_options_prefixes = ("Xep:", "XepExcludedPaths:")
 
 def run(args, javac_commands, jars):
+
+    sys.exit("Intentionally broken to test CI")
+
     # checker-framework javac.
     javacheck = os.environ['CHECKERFRAMEWORK']+"/checker/bin/javac"
     checker_command = [javacheck, "-AmergeStubsWithSource", "-Xmaxerrs", "10000", "-Xmaxwarns", "10000"]
