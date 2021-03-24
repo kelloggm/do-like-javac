@@ -14,12 +14,8 @@ set -o pipefail
 if [ -d /tmp/"$USER"/plume-scripts ] ; then
   git -C /tmp/"$USER"/plume-scripts pull -q > /dev/null 2>&1
 else
-  # re-add `--depth 1` once we no longer are testing non-default branches
-  mkdir -p /tmp/"$USER" && git -C /tmp/"$USER" clone -q https://github.com/plume-lib/plume-scripts.git
+  mkdir -p /tmp/"$USER" && git -C /tmp/"$USER" clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
 fi
-
-# when this branch of plume-scripts is merged, the following line can be removed:
-git -C /tmp/"$USER"/plume-scripts checkout github-actions
 
 ### clone the CF. If there is a branch with the same name as this branch, git-clone-related will check out that branch.
 rm -rf /tmp/"$USER"/checker-framework
