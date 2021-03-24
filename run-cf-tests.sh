@@ -14,7 +14,8 @@ set -o pipefail
 if [ -d /tmp/"$USER"/plume-scripts ] ; then
   git -C /tmp/"$USER"/plume-scripts pull -q > /dev/null 2>&1
 else
-  mkdir -p /tmp/"$USER" && git -C /tmp/"$USER" clone --depth 1 -q https://github.com/plume-lib/plume-scripts.git
+  # re-add `--depth 1` once we no longer are testing non-default branches
+  mkdir -p /tmp/"$USER" && git -C /tmp/"$USER" clone -q https://github.com/plume-lib/plume-scripts.git
 fi
 
 # when this branch of plume-scripts is merged, the following line can be removed:
