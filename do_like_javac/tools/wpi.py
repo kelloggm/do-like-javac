@@ -143,6 +143,10 @@ def run(args, javac_commands, jars):
 
             iterationAjavaDirs = ':'.join(ajavaDirs)
             iterationCheckerCmd = checker_command
+            # TODO: the switch to ajava files instead of stub files should make the separate stubs argument
+            # to dljc unnecessary, as there's no longer any need to combine stub lists.
+            # TODO: do we need to treat the -Aajava argument the same way? I.e., will this work if the user
+            # supplies their own -Aajava= argument as part of the extraJavacArgs argument?
             if args.stubs:
                 iterationCheckerCmd.append("-Astubs=" + str(args.stubs))
             if iterationAjavaDirs != "":
