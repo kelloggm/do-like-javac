@@ -140,13 +140,15 @@ def run(args, javac_commands, jars):
                     other_args.append(str(v))
 
         while diffResult != 0:
-
-            iterationAjavaDirs = ':'.join(ajavaDirs)
             iterationCheckerCmd = checker_command
             if args.stubs:
                 iterationCheckerCmd.append("-Astubs=" + str(args.stubs))
-            if iterationAjavaDirs != "":
-                iterationCheckerCmd.append("-Aajava=" + iterationAjavaDirs)
+            iterationAjavaDirs = ajavaDirs.copy()
+            if args.ajava:
+                iterationAjavaDirs.append(str(args.ajava))
+            if iterationAjavaDirs:
+                iterationCheckerCmd.append(
+                    "-Aajava=" + ":".join(iterationAjavaDirs))
 
             # suppress all type.anno.before.modifier warnings, because delombok
             # prints annotations in the wrong place
