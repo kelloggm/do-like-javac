@@ -37,8 +37,6 @@ def run(args, javac_commands, jars):
     else:
         jdkVersion = 8
 
-    checker_command += check.getArgumentsByVersion(jdkVersion)
-
     if args.extraJavacArgs is not None:
         checker_command += args.extraJavacArgs.split()
 
@@ -115,6 +113,7 @@ def run(args, javac_commands, jars):
         if args.lib_dir:
             cp += pp + args.lib_dir + ':'
 
+        release8 = False
         other_args = []
         for k, v in javac_switches.items():
             if k not in ignored_options and not k.startswith(ignored_options_prefixes):
@@ -126,6 +125,8 @@ def run(args, javac_commands, jars):
                     # the build, and this is the best that DLJC can do in this situation.
                     if v in ["1.5", "5", "1.6", "6", "1.7", "7", "1.8"]:
                         v = "8"
+                    if v == "8":
+                        release8 = True
                     # Do not use source/target, because Java 11 JVMs will
                     # crash on some classes, e.g.
                     # https://bugs.openjdk.java.net/browse/JDK-8212636.
@@ -139,6 +140,13 @@ def run(args, javac_commands, jars):
                     other_args.append("-" + k)
                 if v is not None and v is not True:
                     other_args.append(str(v))
+
+        checker_command += check.getArgumentsByVersion(jdkVersion, other_args)
+
+        if release8:
+            # Avoid javac "error: option --add-opens not allowed with target 1.8"
+            checker_command = [arg for arg in checker_command if not arg.startswith("--add-opens")]
+            other_args = [arg for arg in other_args if not arg.startswith("--add-opens")]
 
         while diffResult != 0:
 
