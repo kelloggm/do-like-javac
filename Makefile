@@ -1,6 +1,6 @@
 all: shell-script-style python-style
 
-BASH_SCRIPTS = run-dljc.sh
+BASH_SCRIPTS = run-cf-tests.sh
 shell-script-style:
 	shellcheck --format=gcc ${BASH_SCRIPTS}
 
