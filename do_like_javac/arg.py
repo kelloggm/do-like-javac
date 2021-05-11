@@ -70,9 +70,10 @@ base_group.add_argument('--quals', metavar='<quals>',
                         action='store',
                         help='Path to custom annotations to put on the classpath when using the Checker Framework.')
 
-base_group.add_argument('--cleanCmd', metavar='<cleanCmd>',
+base_group.add_argument('--extraJavacArgs', metavar='<extraJavacArgs>',
                         action='store',
-                        help='Command to run to clean between rounds of Checker Framework whole-program inference.')
+                        help='List of extra arguments to pass to javac when running a Checker Framework checker. Use this for '
+                             'arguments that are only needed when running a checker, such as -AassumeSideEffectFree.')
 
 def split_args_to_parse():
     split_index = len(sys.argv)

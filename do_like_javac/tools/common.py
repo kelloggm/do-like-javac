@@ -1,5 +1,5 @@
 import sys, os, traceback
-import subprocess32 as subprocess
+import subprocess
 import timeit
 from threading import Timer
 
@@ -56,7 +56,8 @@ def run_cmd(cmd, args=None, tool=None):
   timer = None
   out = None
   out_file = None
-  friendly_cmd = ' '.join(cmd)
+  # Without quoting, empty arguments don't appear in friendly_cmd
+  friendly_cmd = ' '.join("'" + elt + "'" for elt in cmd)
 
   if args and args.verbose and args.log_to_stderr:
     out = sys.stderr
@@ -74,7 +75,8 @@ def run_cmd(cmd, args=None, tool=None):
     stats['timed_out'] = True
     proc.kill()
 
-  output("Running {}\n\n".format(friendly_cmd))
+  # output("\nPath: " + os.environ['PATH'] + "\n")
+  output("\nRunning {}\n\n".format(friendly_cmd))
 
   try:
     start_time = timeit.default_timer()
