@@ -12,11 +12,14 @@ from . import check
 
 argparser = None
 
-banned_options = ("classpath",
+# all options passed to javac by the build system are copied to the invocations
+# of javac that run the Checker Framework, except those that either exactly match
+# an element of ignored_options or start with an element of ignored_options_prefixes
+ignored_options = ("classpath",
                   "nowarn", "Xmaxerrs", "Xmaxwarns", "Werror",
                   "processorpath", "processor", "proc:none",
                   "XepDisableAllChecks", "Xplugin:ErrorProne")
-banned_options_prefixes = ("Xep:", "XepExcludedPaths:")
+ignored_options_prefixes = ("Xep:", "XepExcludedPaths:")
 
 def run(args, javac_commands, jars):
     # checker-framework javac.
@@ -32,8 +35,6 @@ def run(args, javac_commands, jars):
         jdkVersion = int(args.jdkVersion)
     else:
         jdkVersion = 8
-
-    checker_command += check.getArgumentsByVersion(jdkVersion)
 
     if args.extraJavacArgs is not None:
         checker_command += args.extraJavacArgs.split()
@@ -111,9 +112,10 @@ def run(args, javac_commands, jars):
         if args.lib_dir:
             cp += pp + args.lib_dir + ':'
 
+        release8 = False
         other_args = []
         for k, v in list(javac_switches.items()):
-            if k not in banned_options and not k.startswith(banned_options_prefixes):
+            if k not in ignored_options and not k.startswith(ignored_options_prefixes):
                 if k == "source" or k == "target" or k == "-release":
                     # If the source/target is < 8, change it to 8.
                     # The CF is generally incompatible with java versions below 8, so
@@ -122,6 +124,8 @@ def run(args, javac_commands, jars):
                     # the build, and this is the best that DLJC can do in this situation.
                     if v in ["1.5", "5", "1.6", "6", "1.7", "7", "1.8"]:
                         v = "8"
+                    if v == "8":
+                        release8 = True
                     # Do not use source/target, because Java 11 JVMs will
                     # crash on some classes, e.g.
                     # https://bugs.openjdk.java.net/browse/JDK-8212636.
@@ -135,6 +139,13 @@ def run(args, javac_commands, jars):
                     other_args.append("-" + k)
                 if v is not None and v is not True:
                     other_args.append(str(v))
+
+        checker_command += check.getArgumentsByVersion(jdkVersion, other_args)
+
+        if release8:
+            # Avoid javac "error: option --add-opens not allowed with target 1.8"
+            checker_command = [arg for arg in checker_command if not arg.startswith("--add-opens")]
+            other_args = [arg for arg in other_args if not arg.startswith("--add-opens")]
 
         while diffResult != 0:
 
