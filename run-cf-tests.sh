@@ -22,7 +22,7 @@ rm -rf /tmp/"$USER"/checker-framework
 /tmp/"$USER"/plume-scripts/git-clone-related typetools checker-framework /tmp/"$USER"/checker-framework
 export CHECKERFRAMEWORK=/tmp/"$USER"/checker-framework
 
-export DLJC=$(pwd)
+export DLJC=$(pwd)/dljc
 
 cd /tmp/"$USER"/checker-framework
 
