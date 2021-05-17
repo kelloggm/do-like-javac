@@ -6,5 +6,5 @@ shell-script-style:
 
 PYTHON_FILES=$(shell find . -name '*.py' | grep -v randoop_old.py)
 python-style:
-	yapf -i --style='{column_limit: 100}' ${PYTHON_FILES}
+	black .
 	pylint -f parseable --disable=W,invalid-name ${PYTHON_FILES}
