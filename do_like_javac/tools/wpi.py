@@ -1,6 +1,6 @@
 from filecmp import dircmp
 
-import common
+from . import common
 import os
 import pprint
 import shutil
@@ -8,7 +8,7 @@ import tempfile
 from distutils import dir_util
 
 # re-use existing CF build logic
-import check
+from . import check
 
 argparser = None
 
@@ -36,8 +36,6 @@ def run(args, javac_commands, jars):
     else:
         jdkVersion = 8
 
-    checker_command += check.getArgumentsByVersion(jdkVersion)
-
     if args.extraJavacArgs is not None:
         checker_command += args.extraJavacArgs.split()
 
@@ -56,11 +54,11 @@ def run(args, javac_commands, jars):
         ajavaDirs = []
         resultsDir = tempfile.mkdtemp(prefix="wpi-ajava-")
 
-        print "Directory for generated ajava files: " + str(resultsDir)
+        print("Directory for generated stub files: " + str(resultsDir))
 
         javac_switches = jc['javac_switches']
         cp = javac_switches['classpath']
-        if javac_switches.has_key('processor') and len(processorArg) == 2:
+        if 'processor' in javac_switches and len(processorArg) == 2:
             processorArg[1] += "," + javac_switches['processor']
 
         java_files = jc['java_files']
@@ -107,15 +105,16 @@ def run(args, javac_commands, jars):
 
         # include processor path in the class path if it is present
         pp = ''
-        if javac_switches.has_key('processorpath'):
+        if 'processorpath' in javac_switches:
             pp = javac_switches['processorpath'] + ':'
         if args.quals:
             cp += args.quals + ':'
         if args.lib_dir:
             cp += pp + args.lib_dir + ':'
 
+        release8 = False
         other_args = []
-        for k, v in javac_switches.items():
+        for k, v in list(javac_switches.items()):
             if k not in ignored_options and not k.startswith(ignored_options_prefixes):
                 if k == "source" or k == "target" or k == "-release":
                     # If the source/target is < 8, change it to 8.
@@ -125,6 +124,8 @@ def run(args, javac_commands, jars):
                     # the build, and this is the best that DLJC can do in this situation.
                     if v in ["1.5", "5", "1.6", "6", "1.7", "7", "1.8"]:
                         v = "8"
+                    if v == "8":
+                        release8 = True
                     # Do not use source/target, because Java 11 JVMs will
                     # crash on some classes, e.g.
                     # https://bugs.openjdk.java.net/browse/JDK-8212636.
@@ -138,6 +139,13 @@ def run(args, javac_commands, jars):
                     other_args.append("-" + k)
                 if v is not None and v is not True:
                     other_args.append(str(v))
+
+        checker_command += check.getArgumentsByVersion(jdkVersion, other_args)
+
+        if release8:
+            # Avoid javac "error: option --add-opens not allowed with target 1.8"
+            checker_command = [arg for arg in checker_command if not arg.startswith("--add-opens")]
+            other_args = [arg for arg in other_args if not arg.startswith("--add-opens")]
 
         while diffResult != 0:
 
@@ -170,9 +178,9 @@ def run(args, javac_commands, jars):
             try:
                 ajavaFiles = os.listdir(wpiDir)
             except OSError as e:
-                raise Exception("No WPI outputs were discovered. It is likely that WPI failed; "
-                                "please check " + os.path.join(os.getcwd(), 'dljc-out')
-                                + " . Original exception: " + str(e))
+                print("No WPI outputs were discovered; it is likely that WPI failed or the Checker Framework crashed.")
+                print("Check the file " + os.path.join(os.getcwd(), 'dljc-out', 'wpi.log') + " for more information.")
+                raise e
 
             for ajavaFile in ajavaFiles:
                 shutil.move(os.path.join(wpiDir, ajavaFile),

@@ -56,7 +56,8 @@ def run_cmd(cmd, args=None, tool=None):
   timer = None
   out = None
   out_file = None
-  friendly_cmd = ' '.join(cmd)
+  # Without quoting, empty arguments don't appear in friendly_cmd
+  friendly_cmd = ' '.join("'" + elt + "'" for elt in cmd)
 
   if args and args.verbose and args.log_to_stderr:
     out = sys.stderr
@@ -86,13 +87,12 @@ def run_cmd(cmd, args=None, tool=None):
       timer.start()
 
     for line in iter(process.stdout.readline, b''):
-      stats['output'] = stats['output'] + line
-      output(line)
+      stats['output'] = stats['output'] + line.decode()
+      output(line.decode())
 
     process.stdout.close()
-    process.wait()
+    stats['return_code'] = process.wait()
     stats['time'] = timeit.default_timer() - start_time
-    stats['return_code'] = process.returncode
     if timer:
       timer.cancel()
 
