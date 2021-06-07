@@ -52,7 +52,7 @@ def run(args, javac_commands, jars):
         iteration = 0
         diffResult = 1
         ajavaDirs = []
-        resultsDir = tempfile.mkdtemp(prefix="wpi-ajava-")
+        resultsDir = tempfile.mkdtemp(prefix="wpi-ajava-" + datetime.now().format("%Y%m%d-%H%M%S)"))
 
         print("Directory for generated stub files: " + str(resultsDir))
 
@@ -148,8 +148,6 @@ def run(args, javac_commands, jars):
             other_args = [arg for arg in other_args if not arg.startswith("--add-opens")]
 
         while diffResult != 0:
-
-            iterationAjavaDirs = ':'.join(ajavaDirs)
             iterationCheckerCmd = checker_command
             # TODO: the switch to ajava files instead of stub files should make the separate stubs argument
             # to dljc unnecessary, as there's no longer any need to combine stub lists.
@@ -157,8 +155,12 @@ def run(args, javac_commands, jars):
             # supplies their own -Aajava= argument as part of the extraJavacArgs argument?
             if args.stubs:
                 iterationCheckerCmd.append("-Astubs=" + str(args.stubs))
-            if iterationAjavaDirs != "":
-                iterationCheckerCmd.append("-Aajava=" + iterationAjavaDirs)
+            iterationAjavaDirs = ajavaDirs.copy()
+            if args.ajava:
+                iterationAjavaDirs.append(str(args.ajava))
+            if iterationAjavaDirs:
+                iterationCheckerCmd.append(
+                    "-Aajava=" + ":".join(iterationAjavaDirs))
 
             # suppress all type.anno.before.modifier warnings, because delombok
             # prints annotations in the wrong place
