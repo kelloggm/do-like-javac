@@ -1,7 +1,7 @@
 from filecmp import dircmp
 
-import common
 from datetime import datetime
+from . import common
 import os
 import pprint
 import shutil
@@ -9,7 +9,7 @@ import tempfile
 from distutils import dir_util
 
 # re-use existing CF build logic
-import check
+from . import check
 
 argparser = None
 
@@ -53,13 +53,13 @@ def run(args, javac_commands, jars):
         iteration = 0
         diffResult = 1
         stubDirs = []
-        resultsDir = tempfile.mkdtemp(prefix="wpi-stubs-" + datetime.now().format("%Y%m%d%H%M%S)"))
+        resultsDir = tempfile.mkdtemp(prefix="wpi-stubs-" + datetime.now().format("%Y%m%d%H%M%S)") + "-")
 
-        print "Directory for generated stub files: " + str(resultsDir)
+        print("Directory for generated stub files: " + str(resultsDir))
 
         javac_switches = jc['javac_switches']
         cp = javac_switches['classpath']
-        if javac_switches.has_key('processor') and len(processorArg) == 2:
+        if 'processor' in javac_switches and len(processorArg) == 2:
             processorArg[1] += "," + javac_switches['processor']
 
         java_files = jc['java_files']
@@ -106,7 +106,7 @@ def run(args, javac_commands, jars):
 
         # include processor path in the class path if it is present
         pp = ''
-        if javac_switches.has_key('processorpath'):
+        if 'processorpath' in javac_switches:
             pp = javac_switches['processorpath'] + ':'
         if args.quals:
             cp += args.quals + ':'
@@ -115,7 +115,7 @@ def run(args, javac_commands, jars):
 
         release8 = False
         other_args = []
-        for k, v in javac_switches.items():
+        for k, v in list(javac_switches.items()):
             if k not in ignored_options and not k.startswith(ignored_options_prefixes):
                 if k == "source" or k == "target" or k == "-release":
                     # If the source/target is < 8, change it to 8.
@@ -181,9 +181,9 @@ def run(args, javac_commands, jars):
             try:
                 stubs = os.listdir(wpiDir)
             except OSError as e:
-                raise Exception("No WPI outputs were discovered. It is likely that WPI failed; "
-                                "please check " + os.path.join(os.getcwd(), 'dljc-out')
-                                + " . Original exception: " + str(e))
+                print("No WPI outputs were discovered; it is likely that WPI failed or the Checker Framework crashed.")
+                print("Check the file " + os.path.join(os.getcwd(), 'dljc-out', 'wpi.log') + " for more information.")
+                raise e
 
             for stub in stubs:
                 shutil.move(os.path.join(wpiDir, stub), previousIterationDir)
