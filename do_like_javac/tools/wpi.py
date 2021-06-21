@@ -1,6 +1,7 @@
 import datetime
 from filecmp import dircmp
 
+from datetime import datetime
 from . import common
 import os
 import pprint
@@ -53,7 +54,7 @@ def run(args, javac_commands, jars):
         iteration = 0
         diffResult = 1
         ajavaDirs = []
-        resultsDir = tempfile.mkdtemp(prefix="wpi-ajava-" + datetime.now().format("%Y%m%d-%H%M%S)"))
+        resultsDir = tempfile.mkdtemp(prefix="wpi-ajava-" + "%Y%m%d%H%M%S)".format(datetime.now()) + "-")
 
         print("Directory for generated stub files: " + str(resultsDir))
 
