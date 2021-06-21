@@ -1,7 +1,7 @@
 from filecmp import dircmp
 
 import common
-import datetime
+from datetime import datetime
 import os
 import pprint
 import shutil
