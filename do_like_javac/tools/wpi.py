@@ -54,7 +54,8 @@ def run(args, javac_commands, jars):
         iteration = 0
         diffResult = 1
         ajavaDirs = []
-        resultsDir = tempfile.mkdtemp(prefix="wpi-ajava-" + "%Y%m%d%H%M%S)".format(datetime.now()) + "-")
+        stubDirs = []
+        resultsDir = tempfile.mkdtemp(prefix="wpi-ajava-" + datetime.now().strftime("%Y%m%d%H%M%S") + "-")
 
         print("Directory for generated stub files: " + str(resultsDir))
 
