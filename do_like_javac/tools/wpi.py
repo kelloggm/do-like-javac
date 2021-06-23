@@ -52,9 +52,8 @@ def run(args, javac_commands, jars):
             shutil.rmtree(wpiDir)
 
         iteration = 0
-        diffResult = 1
+        diffResult = True
         ajavaDirs = []
-        stubDirs = []
         resultsDir = tempfile.mkdtemp(prefix="wpi-ajava-" + datetime.now().strftime("%Y%m%d%H%M%S") + "-")
 
         print("Directory for generated stub files: " + str(resultsDir))
@@ -150,7 +149,7 @@ def run(args, javac_commands, jars):
             checker_command = [arg for arg in checker_command if not arg.startswith("--add-opens")]
             other_args = [arg for arg in other_args if not arg.startswith("--add-opens")]
 
-        while diffResult != 0:
+        while diffResult:
             iterationCheckerCmd = checker_command
             # TODO: the switch to ajava files instead of stub files should make the separate stubs argument
             # to dljc unnecessary, as there's no longer any need to combine stub lists.
@@ -195,7 +194,12 @@ def run(args, javac_commands, jars):
 
             if len(ajavaDirs) > 1:
                 dcmp = dircmp(ajavaDirs[-1], ajavaDirs[-2])
-                diffResult = len(dcmp.diff_files)
+                diffResult = has_differing_files(dcmp)
 
         # Run one final time without "-Awarns", for the final user output.
         common.run_cmd(cmd, args, 'wpi')
+
+
+def has_differing_files(dcmp):
+    return (dcmp.diff_files
+            or any(map(has_differing_files, dcmp.subdirs.values())))
