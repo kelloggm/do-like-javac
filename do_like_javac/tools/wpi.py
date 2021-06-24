@@ -56,7 +56,7 @@ def run(args, javac_commands, jars):
         ajavaDirs = []
         resultsDir = tempfile.mkdtemp(prefix="wpi-ajava-" + datetime.now().strftime("%Y%m%d%H%M%S") + "-")
 
-        print("Directory for generated stub files: " + str(resultsDir))
+        print("Directory for generated annotation files: " + str(resultsDir))
 
         javac_switches = jc['javac_switches']
         cp = javac_switches['classpath']
