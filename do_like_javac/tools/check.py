@@ -48,7 +48,7 @@ def getArgumentsByVersion(jdkVersion, other_args=[]):
     result = []
     if version == 8:
         result += ['-J-Xbootclasspath/p:' + os.environ['CHECKERFRAMEWORK'] + '/checker/dist/javac.jar']
-    elif version == 11 or version == 17:
+    elif version == 11 or version >= 16:
         release_8 = False
         for i, str in enumerate(other_args):
             if str == '--release' and other_args[i+1] == "8":
@@ -57,7 +57,7 @@ def getArgumentsByVersion(jdkVersion, other_args=[]):
             # Avoid javac "error: option --add-opens not allowed with target 1.8"
             if version == 11:
                 result += ['-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED']
-            elif version == 17:
+            elif version >= 16:
                 result += ['-J--add-opens=jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED',
                            '-J--add-opens=jdk.compiler/com.sun.tools.javac.code=ALL-UNNAMED',
                            '-J--add-opens=jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED',
