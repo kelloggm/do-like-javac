@@ -162,7 +162,9 @@ def run(args, javac_commands, jars):
             # supplies their own -Aajava= argument as part of the extraJavacArgs argument?
             if args.stubs:
                 iterationCheckerCmd.append("-Astubs=" + str(args.stubs))
-            iterationAjavaDirs = ajavaDirs.copy()
+            # only use the last element in ajavaDirs, to avoid an ambiguity warning that would be issued
+            # if two ajava files for the same source file were to be passed
+            iterationAjavaDirs = [ajavaDirs[-1]] if ajavaDirs else []
             if args.ajava:
                 iterationAjavaDirs.append(str(args.ajava))
             if iterationAjavaDirs:
