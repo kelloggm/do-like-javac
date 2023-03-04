@@ -74,7 +74,10 @@ def run_cmd(cmd, args=None, tool=None):
       out.write(line)
       out.flush()
 
-  output(f"Running {friendly_cmd}\n\n")
+  if tool is None:
+    output(f"Running for unknown tool: {friendly_cmd}\n\n")
+  else
+    output(f"Running for {tool}: {friendly_cmd}\n\n")
 
   try:
     start_time = timeit.default_timer()

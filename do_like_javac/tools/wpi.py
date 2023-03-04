@@ -40,6 +40,9 @@ def run(args, javac_commands, jars):
 
     if args.extraJavacArgs is not None:
         checker_command += args.extraJavacArgs.split()
+    for i in range(len(checker_command)):
+        if checker_command[i] == '""' or checker_command[i] == '""':
+            checker_command[i] = ''
 
     for jc in javac_commands:
 
@@ -145,6 +148,8 @@ def run(args, javac_commands, jars):
                     if v is None or v is not False:
                         other_args.append("-" + k)
                     if v is not None and v is not True:
+                        if v == '""' or v == "''":
+                            v = ''
                         other_args.append(str(v))
 
         checker_command += check.getArgumentsByVersion(jdkVersion, other_args)
