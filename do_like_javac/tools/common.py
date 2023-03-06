@@ -76,7 +76,7 @@ def run_cmd(cmd, args=None, tool=None):
 
   if tool is None:
     output(f"Running for unknown tool: {friendly_cmd}\n\n")
-  else
+  else:
     output(f"Running for {tool}: {friendly_cmd}\n\n")
 
   try:
