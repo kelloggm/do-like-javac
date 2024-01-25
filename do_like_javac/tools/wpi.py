@@ -47,7 +47,7 @@ def run(args, javac_commands, jars):
     for jc in javac_commands:
 
         # something searchable to delineate different javac commands
-        common.run_cmd(["echo", "\"-----------------------------------------------------------\""], args, "wpi")
+        common.run_cmd(["true", "=== Beginning of WPI run for extracted javac command: " + str(jc) +"  ==="], args, "wpi")
 
         wpiDir = os.path.join(os.getcwd(), 'build/whole-program-inference')
         # if there is already a WPI directory, delete it and start over
@@ -160,6 +160,10 @@ def run(args, javac_commands, jars):
             other_args = [arg for arg in other_args if not arg.startswith("--add-opens")]
 
         while diffResult:
+            # This is definitely hacky. "true" is a bash no-op, so this command actually does nothing. However, it gets
+            # written into the log of the commands that WPI has executed, so basically it's a comment in that log.
+            # That log is controlled by logic inside common.run_cmd, so it can't be written to directly from here.
+            common.run_cmd(["true", "=== Starting WPI iteration " + str(iteration) + ": ==="], args, "wpi")
             iterationCheckerCmd = checker_command.copy()
             # TODO: the switch to ajava files instead of stub files should make the separate stubs argument
             # to dljc unnecessary, as there's no longer any need to combine stub lists.
@@ -209,6 +213,7 @@ def run(args, javac_commands, jars):
                 diffResult = has_differing_files(dcmp)
 
         # Run one final time without "-Awarns", for the final user output.
+        common.run_cmd(["true", "=== WPI finished. Output of final typechecking run: ==="], args, "wpi")
         common.run_cmd(cmd, args, 'wpi')
 
 
