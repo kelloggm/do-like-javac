@@ -68,6 +68,10 @@ def run(args, javac_commands, jars):
 
         java_files = jc['java_files']
 
+        if len(java_files) == 0:
+            # do not attempt to run WPI on a javac command with no source files, for whatever reason
+            continue
+
         # delombok
         delombok = False
         jars = cp.split(":")
